@@ -1,0 +1,12 @@
+{% extends "myapp/base.html" %}
+
+{% block content %}
+<h1>{{ record.name }}</h1>
+
+<p>Category: {{ record.category }}</p>
+
+<p>Value: {{ record.value }}</p>
+
+<a href="{% url 'record_edit' record.id %}">Edit</a>
+<a href="{% url 'record_delete' record.id %}">Delete</a>
+{% endblock %}

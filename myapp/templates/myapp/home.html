@@ -1,8 +1,9 @@
 {% extends "myapp/base.html" %}
 
-{% block title%} Home {%endblock%}
+{% block content %}
+<h1>Dataset Overview</h1>
 
-{%block content%}
-<h1> Home page</h1>
-<p> This page uses the base layout</p>
-{%endblock%}
+<p>This project takes baseball batting and local weather statistics to see if weather affects batting</p>
+
+<a href="{% url 'records' %}">View Records</a>
+{% endblock %}
