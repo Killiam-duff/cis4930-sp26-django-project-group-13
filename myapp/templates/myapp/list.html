@@ -1,16 +1,13 @@
 {% extends "myapp/base.html" %}
 
 {% block content %}
-
 <h1>Records</h1>
 
 {% for record in page_obj %}
     <p>
-        <a href="{% url 'record_detail' record.id %}">
-            {{ record.name }}
+        <a href="{% url 'record_detail' record.pk %}">
+            {{ record }}
         </a>
-        - {{ record.category }}
-        - {{ record.value }}
     </p>
 {% empty %}
     <p>No records found.</p>
@@ -18,10 +15,11 @@
 
 <div>
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">Prev</a>
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
     {% endif %}
 
-    <span>Page {{ page_obj.number }}</span>
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
     {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}">Next</a>

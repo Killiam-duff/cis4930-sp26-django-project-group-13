@@ -44,3 +44,9 @@ def record_delete(request, pk):
         return redirect("records")
 
     return render(request, "myapp/confirm_delete.html", {"record": record})
+
+def analytics(request):
+    return render(request, "myapp/analytics.html", {"analytics": analytics})
+
+
+

@@ -1,1 +1,30 @@
-#initial commit
+body {
+    margin: 0;
+}
+
+.navbar {
+    background-color: white;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;                 
+    border-bottom: 1px solid #ccc;
+}
+
+.navbar a {
+    flex: 1;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.navbar a:visited {
+    color: #6f42c1;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
