@@ -1,1 +1,1 @@
-#initial commit
+web: gunicorn config.wsgi --log-file -
