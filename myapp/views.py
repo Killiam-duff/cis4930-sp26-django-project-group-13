@@ -84,10 +84,11 @@ def analytics(request):
         'weather_df_empty': weather_df.empty,
     })
 
-
+"""
 @staff_member_required
 def fetch_data_view(request):
     if request.method != 'POST':
         return HttpResponseForbidden()
     call_command('fetch_data')
     return redirect('analytics')
+"""

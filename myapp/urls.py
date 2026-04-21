@@ -12,7 +12,7 @@ urlpatterns = [
     path("records/<int:pk>/delete/", views.record_delete, name="record_delete"),
 
     path("records/", views.record_list, name="records"),
-    path("fetch/", views.fetch_data_view, name="fetch_data"),
+    #path("fetch/", views.fetch_data_view, name="fetch_data"),
 
     #root
     path("", views.home, name="home"),

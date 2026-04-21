@@ -1,9 +1,27 @@
 {% extends "myapp/base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>Dataset Overview</h1>
 
-<p>This project takes baseball batting and local weather statistics to see if weather affects batting</p>
+<div class="home-container">
 
-<a href="{% url 'records' %}">View Records</a>
+    <div class="home-header">
+        <h1>Baseball/Weather Dashboard</h1>
+        <p>An overview of batting and weather records.</p>
+    </div>
+
+    <div class="home-stats">
+        <div class="stat-box">
+            <h2>{{ total_records }}</h2>
+            <p>Total Records</p>
+        </div>
+    </div>
+
+    <div class="home-links">
+        <a href="{% url 'records' %}" class="home-link">View Records</a>
+        <a href="{% url 'analytics' %}" class="home-link">View Analytics</a>
+    </div>
+
+</div>
+
 {% endblock %}

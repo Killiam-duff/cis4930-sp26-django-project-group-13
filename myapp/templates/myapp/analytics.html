@@ -1,54 +1,94 @@
-{% extends 'myapp/base.html' %}
+{% extends "myapp/base.html" %}
 
 {% block content %}
 
-<h2>Analytics</h2>
+<div class="container mt-4">
 
-<div class="row mb-4">
+    <h2 class="mb-4">Weather Analytics Dashboard</h2>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h5>Total Records</h5>
-            <p>{{ total_records }}</p>
+    {% if empty %}
+        <p>No weather data available</p>
+    {% else %}
+
+    <!-- Summary of cities -->
+    <div class="row">
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3">
+                <h5>Total Records</h5>
+                <h3>{{ summary.total_records }}</h3>
+            </div>
         </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3">
+                <h5>Avg Max Temp</h5>
+                <h3>{{ summary.avg_max_temp|floatformat:2 }} °F</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3">
+                <h5>Avg Min Temp</h5>
+                <h3>{{ summary.avg_min_temp|floatformat:2 }} °F</h3>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h5>Average Value</h5>
-            <p>{{ avg_value }}</p>
+    <div class="row mt-3">
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Max Temp</h5>
+                <h3>{{ summary.max_temp }} °F</h3>
+            </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Min Temp</h5>
+                <h3>{{ summary.min_temp }} °F</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Avg Precipitation</h5>
+                <h3>{{ summary.avg_precip|floatformat:2 }} in</h3>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h5>Max Value</h5>
-            <p>{{ max_value }}</p>
-        </div>
-    </div>
+    <!-- City information-->
+    <h4 class="mt-5">City Breakdown</h4>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>Avg Max Temp</th>
+                <th>Avg Min Temp</th>
+                <th>Avg Precip</th>
+                <th>Avg Wind</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in city_stats %}
+            <tr>
+                <td>{{ row.city__name }}</td>
+                <td>{{ row.temp_max_f|floatformat:2 }}</td>
+                <td>{{ row.temp_min_f|floatformat:2 }}</td>
+                <td>{{ row.precipitation_in|floatformat:2 }}</td>
+                <td>{{ row.windspeed_max_mph|floatformat:2 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% endif %}
 
 </div>
-
-<!-- Chart -->
-<div class="card p-3">
-    <canvas id="chart"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-const data = JSON.parse('{{ chart_json|safe }}');
-
-new Chart(document.getElementById("chart"), {
-    type: "bar",
-    data: {
-        labels: data.labels,
-        datasets: [{
-            label: "Sample Data",
-            data: data.values
-        }]
-    }
-});
-</script>
 
 {% endblock %}

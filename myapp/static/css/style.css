@@ -1,24 +1,33 @@
 body {
     margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
 }
 
+/* need 5 major changes to website layout */
+/* 1. navbar */
 .navbar {
     background-color: white;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    padding: 20px 0;                 
-    border-bottom: 1px solid #ccc;
+    padding: 18px 0;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar a {
     flex: 1;
     text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: #007BFF;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0d6efd;
     text-decoration: none;
+    padding: 10px;
+    transition: all 0.2s ease-in-out;
 }
 
 .navbar a:visited {
@@ -26,5 +35,71 @@ body {
 }
 
 .navbar a:hover {
-    text-decoration: underline;
+    background-color: #e9ecef;
+    border-radius: 8px;
+}
+
+/* 2. page container*/
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* 3. adding cards */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: none;
+    transition: transform 0.2s ease;
+}
+
+/* 4. improving table layout */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+table tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* 5. improving forms layout */
+form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 16px;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0b5ed7;
 }

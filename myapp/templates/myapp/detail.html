@@ -1,12 +1,17 @@
 {% extends "myapp/base.html" %}
 
+{% block title%} Details {%endblock%}
+
 {% block content %}
-<h1>{{ record.name }}</h1>
+<h1>{{ record.player }}</h1>
+<!-- batting data display -->
+<p>Team: {{ record.team.abbreviation }}</p>
+<p>Batting Avg: {{ record.batting_avg }}</p>
+<p>OPS: {{ record.ops }}</p>
+<p>Home Runs: {{ record.home_runs }}</p>
+<p>WAR: {{ record.war }}</p>
 
-<p>Category: {{ record.category }}</p>
+<a href="{% url 'record_edit' record.pk %}">Edit</a>
+<a href="{% url 'record_delete' record.pk %}">Delete</a>
 
-<p>Value: {{ record.value }}</p>
-
-<a href="{% url 'record_edit' record.id %}">Edit</a>
-<a href="{% url 'record_delete' record.id %}">Delete</a>
 {% endblock %}
