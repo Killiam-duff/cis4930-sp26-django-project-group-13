@@ -4,7 +4,35 @@
 
 <h2>Analytics</h2>
 
-<canvas id="chart"></canvas>
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Total Records</h5>
+            <p>{{ total_records }}</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Average Value</h5>
+            <p>{{ avg_value }}</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Max Value</h5>
+            <p>{{ max_value }}</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart -->
+<div class="card p-3">
+    <canvas id="chart"></canvas>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
