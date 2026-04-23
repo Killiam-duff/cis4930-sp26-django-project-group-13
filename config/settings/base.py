@@ -1,12 +1,13 @@
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool, default=False)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = str(config('ALLOWED_HOSTS', default='127.0.0.1,localhost')).split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -50,10 +51,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        str(config('DATABASE_URL', default='sqlite:///db.sqlite3'))
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
