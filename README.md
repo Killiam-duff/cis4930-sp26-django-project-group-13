@@ -37,7 +37,8 @@ API ingestion via Django management command (project 2 data)
 git clone https://github.com/Killiam-duff/cis4930-sp26-django-project-group-13.git
 
 cp .env.example .env
-sed -i "s|SECRET_KEY=.*|SECRET_KEY=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')|" .env
+
+# Replace Secret Key with your own
 
 pip install -r requirements.txt
 
