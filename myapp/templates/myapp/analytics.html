@@ -1,94 +1,371 @@
 {% extends "myapp/base.html" %}
+{% load static %}
+
+{% block title %}Analytics{% endblock %}
 
 {% block content %}
-
 <div class="container mt-4">
 
-    <h2 class="mb-4">Weather Analytics Dashboard</h2>
+    <h2>Analytics Dashboard</h2>
+    <p>Batting statistics and weather data visualized.</p>
 
-    {% if empty %}
-        <p>No weather data available</p>
+    <!--  BATTING SECTION -->
+    <h3>Batting Analytics</h3>
+
+    {% if batting_df_empty %}
+        <p>No batting data found. Run <code>python manage.py seed_data</code> to load records.</p>
     {% else %}
 
-    <!-- Summary of cities -->
-    <div class="row">
-
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h5>Total Records</h5>
-                <h3>{{ summary.total_records }}</h3>
+        <!-- Summary stat cards -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Total Players</p>
+                    <h4>{{ batting_summary.total_players }}</h4>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg OPS</p>
+                    <h4>{{ batting_summary.avg_ops }}</h4>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg Home Runs</p>
+                    <h4>{{ batting_summary.avg_hr }}</h4>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg WAR</p>
+                    <h4>{{ batting_summary.avg_war }}</h4>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h5>Avg Max Temp</h5>
-                <h3>{{ summary.avg_max_temp|floatformat:2 }} °F</h3>
+        <!-- Charts row 1: league comparison + OPS distribution -->
+        <div class="row mt-2">
+            <div class="col-md-7 mb-4">
+                <div class="card p-3">
+                    <h5>Avg OPS / HR / WAR by League</h5>
+                    <canvas id="leagueChart" height="180"></canvas>
+                </div>
+            </div>
+            <div class="col-md-5 mb-4">
+                <div class="card p-3">
+                    <h5>OPS Tier Distribution</h5>
+                    <canvas id="opsDoughnutChart" height="180"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h5>Avg Min Temp</h5>
-                <h3>{{ summary.avg_min_temp|floatformat:2 }} °F</h3>
+        <!-- Charts row 2: top 10 by OPS -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card p-3">
+                    <h5>Top 10 Players by OPS</h5>
+                    <canvas id="topOpsChart" height="120"></canvas>
+                </div>
             </div>
         </div>
 
-    </div>
+        <!-- League breakdown table -->
+        <h5 class="mt-2 mb-2">League Breakdown</h5>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>League</th>
+                    <th>Avg OPS</th>
+                    <th>Avg Home Runs</th>
+                    <th>Avg WAR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in league_stats_rows %}
+                <tr>
+                    <td>
+                        {% if row.league == 'AL' %}American League (AL)
+                        {% elif row.league == 'NL' %}National League (NL)
+                        {% else %}Both Leagues (2LG)
+                        {% endif %}
+                    </td>
+                    <td>{{ row.avg_ops }}</td>
+                    <td>{{ row.avg_hr }}</td>
+                    <td>{{ row.avg_war }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No data.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <div class="row mt-3">
-
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Max Temp</h5>
-                <h3>{{ summary.max_temp }} °F</h3>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Min Temp</h5>
-                <h3>{{ summary.min_temp }} °F</h3>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Avg Precipitation</h5>
-                <h3>{{ summary.avg_precip|floatformat:2 }} in</h3>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- City information-->
-    <h4 class="mt-5">City Breakdown</h4>
-
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <th>City</th>
-                <th>Avg Max Temp</th>
-                <th>Avg Min Temp</th>
-                <th>Avg Precip</th>
-                <th>Avg Wind</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for row in city_stats %}
-            <tr>
-                <td>{{ row.city__name }}</td>
-                <td>{{ row.temp_max_f|floatformat:2 }}</td>
-                <td>{{ row.temp_min_f|floatformat:2 }}</td>
-                <td>{{ row.precipitation_in|floatformat:2 }}</td>
-                <td>{{ row.windspeed_max_mph|floatformat:2 }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Batting summary stats table -->
+        <h5 class="mt-4 mb-2">Batting Summary Statistics</h5>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Mean</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>OPS</td>
+                    <td>{{ batting_summary.avg_ops }}</td>
+                    <td>{{ batting_summary.min_ops }}</td>
+                    <td>{{ batting_summary.max_ops }}</td>
+                </tr>
+                <tr>
+                    <td>Home Runs</td>
+                    <td>{{ batting_summary.avg_hr }}</td>
+                    <td>—</td>
+                    <td>{{ batting_summary.max_hr }}</td>
+                </tr>
+                <tr>
+                    <td>WAR</td>
+                    <td>{{ batting_summary.avg_war }}</td>
+                    <td>—</td>
+                    <td>{{ batting_summary.max_war }}</td>
+                </tr>
+                <tr>
+                    <td>Batting Average</td>
+                    <td>{{ batting_summary.avg_batting_avg }}</td>
+                    <td>—</td>
+                    <td>—</td>
+                </tr>
+            </tbody>
+        </table>
 
     {% endif %}
 
-</div>
+    <!--  WEATHER SECTION -->
+    <h3>Weather Analytics</h3>
+
+    {% if weather_df_empty %}
+        <p>No weather data found. Run <code>python manage.py fetch_data</code> to populate weather records.</p>
+    {% else %}
+
+        <!-- Weather summary cards -->
+        <div class="row">
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Records</p>
+                    <h4>{{ weather_summary.total_records }}</h4>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg High</p>
+                    <h4>{{ weather_summary.avg_max_temp }}°F</h4>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg Low</p>
+                    <h4>{{ weather_summary.avg_min_temp }}°F</h4>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Record High</p>
+                    <h4>{{ weather_summary.max_temp }}°F</h4>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Record Low</p>
+                    <h4>{{ weather_summary.min_temp }}°F</h4>
+                </div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <div class="card p-3 text-center">
+                    <p>Avg Precip</p>
+                    <h4>{{ weather_summary.avg_precip }}"</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather charts -->
+        <div class="row mt-2">
+            <div class="col-md-8 mb-4">
+                <div class="card p-3">
+                    <h5>Avg Max Temperature by Month</h5>
+                    <canvas id="tempLineChart" height="160"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card p-3">
+                    <h5>Total Precipitation by City</h5>
+                    <canvas id="precipBarChart" height="160"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- City breakdown table -->
+        <h5 class="mt-2 mb-2">City Breakdown</h5>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>City</th>
+                    <th>Avg Max Temp (°F)</th>
+                    <th>Avg Min Temp (°F)</th>
+                    <th>Avg Precip (in)</th>
+                    <th>Avg Max Wind (mph)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in city_stats_rows %}
+                <tr>
+                    <td>{{ row.city__name }}</td>
+                    <td>{{ row.temp_max_f }}</td>
+                    <td>{{ row.temp_min_f }}</td>
+                    <td>{{ row.precipitation_in }}</td>
+                    <td>{{ row.windspeed_max_mph }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">No city data.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+</div><!-- /container -->
+
+<!-- ================================================================ -->
+<!--  Chart.js                                                         -->
+<!-- ================================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+{% if not batting_df_empty %}
+<script>
+// ---- data from view ----
+const leagueData  = {{ batting_chart_ops_league_json|safe }};
+const topOpsData  = {{ batting_chart_top_ops_json|safe }};
+const opsDistData = {{ batting_chart_ops_dist_json|safe }};
+
+// ---- 1. League grouped bar chart ----
+new Chart(document.getElementById('leagueChart'), {
+    type: 'bar',
+    data: {
+        labels: leagueData.labels,
+        datasets: [
+            {
+                label: 'Avg OPS',
+                data: leagueData.ops,
+                backgroundColor: '#0d6efd99',
+                borderColor: '#0d6efd',
+                borderWidth: 1,
+            },
+            {
+                label: 'Avg HR',
+                data: leagueData.hr,
+                backgroundColor: '#dc354599',
+                borderColor: '#dc3545',
+                borderWidth: 1,
+            },
+            {
+                label: 'Avg WAR',
+                data: leagueData.war,
+                backgroundColor: '#19875499',
+                borderColor: '#198754',
+                borderWidth: 1,
+            },
+        ],
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } },
+    },
+});
+
+// ---- 2. Top 10 OPS horizontal bar ----
+new Chart(document.getElementById('topOpsChart'), {
+    type: 'bar',
+    data: {
+        labels: topOpsData.labels,
+        datasets: [{
+            label: 'OPS',
+            data: topOpsData.ops,
+            backgroundColor: '#0d6efd99',
+            borderColor: '#0d6efd',
+            borderWidth: 1,
+        }],
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: false, min: 0.6 } },
+    },
+});
+
+// ---- 3. OPS distribution doughnut ----
+new Chart(document.getElementById('opsDoughnutChart'), {
+    type: 'doughnut',
+    data: {
+        labels: opsDistData.labels,
+        datasets: [{
+            data: opsDistData.counts,
+            backgroundColor: ['#0d6efd', '#198754', '#fd7e14', '#dc3545'],
+            borderWidth: 2,
+            borderColor: '#fff',
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 14, padding: 12 } },
+        },
+    },
+});
+</script>
+{% endif %}
+
+{% if not weather_df_empty %}
+<script>
+const tempData   = {{ weather_chart_temp_json|safe }};
+const precipData = {{ weather_chart_precip_json|safe }};
+
+// ---- 4. Temperature line chart ----
+new Chart(document.getElementById('tempLineChart'), {
+    type: 'line',
+    data: tempData,
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+            y: {
+                title: { display: true, text: '°F' },
+            },
+        },
+    },
+});
+
+// ---- 5. Precipitation bar chart ----
+new Chart(document.getElementById('precipBarChart'), {
+    type: 'bar',
+    data: {
+        labels: precipData.labels,
+        datasets: [{
+            label: 'Total Precipitation (in)',
+            data: precipData.values,
+            backgroundColor: '#0d6efd99',
+            borderColor: '#0d6efd',
+            borderWidth: 1,
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'inches' } } },
+    },
+});
+</script>
+{% endif %}
 
 {% endblock %}
